@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101827"><meta name="description" content="Personal AI Video Maker Pro prompt studio">
+<link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css">
+<title>AI Video Maker Pro</title>
+</head>
+<body>
+<header><div class="brand">🎬 AI VIDEO MAKER <span>PRO</span></div><small>Personal Studio · Free Starter</small></header>
+<main>
+<section class="hero"><p class="eyebrow">YOUR CREATIVE WORKSPACE</p><h1>अपना वीडियो आइडिया तैयार करें</h1><p>Prompt लिखें, format चुनें और AI video tool में इस्तेमाल करने के लिए तैयार prompt बनाएं।</p></section>
+<section class="panel">
+<label for="topic">वीडियो का विषय / Video topic</label>
+<textarea id="topic" rows="4" placeholder="उदाहरण: The birth of the Sun, explained with realistic space visuals..."></textarea>
+<div class="grid">
+<div><label for="language">Prompt language</label><select id="language"><option value="English">English</option><option value="Hindi">Hindi</option></select></div>
+<div><label for="format">Video format</label><select id="format"><option value="9:16">YouTube Shorts · 9:16</option><option value="16:9">YouTube · 16:9</option></select></div>
+<div><label for="duration">Duration</label><select id="duration"><option>15 seconds</option><option selected>30 seconds</option><option>60 seconds</option><option>5 minutes</option></select></div>
+<div><label for="style">Visual style</label><select id="style"><option>Photorealistic documentary</option><option>Cinematic realistic</option><option>3D animation</option><option>Educational explainer</option></select></div>
+</div>
+<label for="voice">Voice-over</label><select id="voice"><option>English AI voice</option><option>Hindi AI voice</option><option>No voice-over</option></select>
+<div class="actions"><button id="build">✨ Build my video prompt</button><button class="secondary" id="save">Save project</button></div>
+</section>
+<section class="panel">
+<div class="row"><h2>Generated prompt</h2><span id="status" class="tag">Not generated</span></div>
+<textarea id="output" rows="9" readonly placeholder="आपका तैयार prompt यहाँ आएगा..."></textarea>
+<div class="actions"><button class="secondary" id="copy">Copy prompt</button><button class="secondary" id="download">Download .txt</button></div>
+</section>
+<section class="panel">
+<h2>Saved projects</h2><div id="saved" class="saved empty">अभी कोई project save नहीं है।</div>
+</section>
+<section class="notice"><b>ध्यान दें:</b> यह v3 एक काम करने वाला Prompt Studio/PWA starter है। इसमें अभी वास्तविक AI video-generation engine/API जुड़ा नहीं है। इसलिए यह खुद MP4 वीडियो generate करने का दावा नहीं करता। ₹0 बजट में अभी prompt बनाना, save करना और export करना उपलब्ध है।</section>
+</main>
+<footer>AI Video Maker Pro · Version 3.0 · Personal use</footer>
+<script src="app.js"></script>
+</body></html>
