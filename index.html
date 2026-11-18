@@ -109,6 +109,40 @@ speech.lang=document.getElementById("lang").value==="Hindi"?"hi-IN":"en-US";
 speechSynthesis.cancel();
 speechSynthesis.speak(speech);
 }
+function downloadVoice(){
+  const text = document.getElementById("output").innerText;
+  if(!text || text.includes("will appear")){
+    alert("Please generate a video plan first");
+    return;
+  }
+
+  const speech = new SpeechSynthesisUtterance(text);
+  speech.lang = document.getElementById("lang").value === "Hindi"
+    ? "hi-IN" : "en-US";
+
+  speech.onend = function(){
+    alert("Voice playback completed!");
+  };
+
+  speechSynthesis.speak(speech);
+}
+
+function downloadPlan(){
+  const text = document.getElementById("output").innerText;
+  if(!text || text.includes("will appear")){
+    alert("Generate a video plan first");
+    return;
+  }
+
+  const blob = new Blob([text], {type:"text/plain"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "AI-Video-Plan.txt";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 </script>
 </body>
 </html>
