@@ -1,37 +1,114 @@
-<!doctype html>
-<html lang="hi">
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#101827"><meta name="description" content="Personal AI Video Maker Pro prompt studio">
-<link rel="manifest" href="manifest.webmanifest"><link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Video Maker Pro</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101326;color:white;font-family:Arial,sans-serif;padding:20px}
+.container{max-width:600px;margin:auto}
+h1{text-align:center;color:#8b9cff}
+.card{background:#1c2140;padding:18px;border-radius:15px;margin-top:18px}
+label{display:block;margin:14px 0 7px}
+textarea,select{width:100%;padding:13px;border-radius:9px;border:0;background:#303858;color:white;font-size:16px}
+textarea{height:110px}
+button{width:100%;padding:15px;margin-top:15px;border:0;border-radius:10px;background:#655cff;color:white;font-size:17px;font-weight:bold}
+.output{white-space:pre-wrap;line-height:1.6;background:#101326;padding:14px;border-radius:10px;margin-top:15px;min-height:60px}
+.small{text-align:center;color:#aaa;font-size:13px}
+</style>
 </head>
 <body>
-<header><div class="brand">🎬 AI VIDEO MAKER <span>PRO</span></div><small>Personal Studio · Free Starter</small></header>
-<main>
-<section class="hero"><p class="eyebrow">YOUR CREATIVE WORKSPACE</p><h1>अपना वीडियो आइडिया तैयार करें</h1><p>Prompt लिखें, format चुनें और AI video tool में इस्तेमाल करने के लिए तैयार prompt बनाएं।</p></section>
-<section class="panel">
-<label for="topic">वीडियो का विषय / Video topic</label>
-<textarea id="topic" rows="4" placeholder="उदाहरण: The birth of the Sun, explained with realistic space visuals..."></textarea>
-<div class="grid">
-<div><label for="language">Prompt language</label><select id="language"><option value="English">English</option><option value="Hindi">Hindi</option></select></div>
-<div><label for="format">Video format</label><select id="format"><option value="9:16">YouTube Shorts · 9:16</option><option value="16:9">YouTube · 16:9</option></select></div>
-<div><label for="duration">Duration</label><select id="duration"><option>15 seconds</option><option selected>30 seconds</option><option>60 seconds</option><option>5 minutes</option></select></div>
-<div><label for="style">Visual style</label><select id="style"><option>Photorealistic documentary</option><option>Cinematic realistic</option><option>3D animation</option><option>Educational explainer</option></select></div>
+<div class="container">
+<h1>🎬 AI VIDEO MAKER PRO</h1>
+<p class="small">Create amazing video scripts and AI prompts</p>
+
+<div class="card">
+<label>Enter Your Video Topic</label>
+<textarea id="topic" placeholder="Example: What happens inside a black hole?"></textarea>
+
+<label>Video Language</label>
+<select id="lang">
+<option value="English">English</option>
+<option value="Hindi">Hindi</option>
+</select>
+
+<label>Video Format</label>
+<select id="format">
+<option value="9:16">YouTube Shorts (9:16)</option>
+<option value="16:9">YouTube Video (16:9)</option>
+</select>
+
+<label>Video Duration</label>
+<select id="duration">
+<option>30 Seconds</option>
+<option>60 Seconds</option>
+</select>
+
+<button onclick="generate()">Generate Video Prompt</button>
 </div>
-<label for="voice">Voice-over</label><select id="voice"><option>English AI voice</option><option>Hindi AI voice</option><option>No voice-over</option></select>
-<div class="actions"><button id="build">✨ Build my video prompt</button><button class="secondary" id="save">Save project</button></div>
-</section>
-<section class="panel">
-<div class="row"><h2>Generated prompt</h2><span id="status" class="tag">Not generated</span></div>
-<textarea id="output" rows="9" readonly placeholder="आपका तैयार prompt यहाँ आएगा..."></textarea>
-<div class="actions"><button class="secondary" id="copy">Copy prompt</button><button class="secondary" id="download">Download .txt</button></div>
-</section>
-<section class="panel">
-<h2>Saved projects</h2><div id="saved" class="saved empty">अभी कोई project save नहीं है।</div>
-</section>
-<section class="notice"><b>ध्यान दें:</b> यह v3 एक काम करने वाला Prompt Studio/PWA starter है। इसमें अभी वास्तविक AI video-generation engine/API जुड़ा नहीं है। इसलिए यह खुद MP4 वीडियो generate करने का दावा नहीं करता। ₹0 बजट में अभी prompt बनाना, save करना और export करना उपलब्ध है।</section>
-</main>
-<footer>AI Video Maker Pro · Version 3.0 · Personal use</footer>
-<script src="app.js"></script>
-</body></html>
+
+<div class="card">
+<h3>✨ Your Video Plan</h3>
+<div id="output" class="output">Your video plan will appear here...</div>
+<button onclick="copyText()">Copy Video Plan</button>
+<button onclick="makeVoice()">🔊 Listen to Voice</button>
+</div>
+
+<p class="small">AI Video Maker Pro | Version 1.0</p>
+</div>
+
+<script>
+function generate(){
+let topic=document.getElementById("topic").value.trim();
+let lang=document.getElementById("lang").value;
+let format=document.getElementById("format").value;
+let duration=document.getElementById("duration").value;
+if(!topic){alert("Please enter a video topic!");return;}
+let text=`AI VIDEO MAKER PRO
+
+TOPIC: ${topic}
+LANGUAGE: ${lang}
+FORMAT: ${format}
+DURATION: ${duration}
+
+SCENE 1 - HOOK
+Create a powerful opening scene about ${topic}. Use cinematic camera movement and realistic visuals.
+
+SCENE 2 - EXPLANATION
+Show detailed realistic visuals explaining ${topic}. Use dramatic lighting and smooth camera movement.
+
+SCENE 3 - AMAZING FACT
+Show an impressive visual fact about ${topic}. Use 4K documentary style.
+
+SCENE 4 - ENDING
+Create a memorable ending with cinematic visuals.
+
+VOICEOVER:
+Write an engaging ${lang} narration about ${topic}, suitable for a ${duration} video.
+
+EDITING:
+Use smooth transitions, background music, subtitles and sound effects.
+
+VIDEO QUALITY:
+Ultra realistic, cinematic, 4K.
+Aspect ratio: ${format}`;
+document.getElementById("output").innerText=text;
+}
+function copyText(){
+let text=document.getElementById("output").innerText;
+if(!text || text.includes("will appear")){alert("Generate a video plan first");return;}
+navigator.clipboard.writeText(text).then(()=>alert("Copied successfully!")).catch(()=>alert("Please select and copy the text manually."));
+}
+function makeVoice(){
+let text=document.getElementById("output").innerText;
+if(!text || text.includes("will appear")){alert("Generate a video plan first");return;}
+let speech=new SpeechSynthesisUtterance(text);
+speech.lang=document.getElementById("lang").value==="Hindi"?"hi-IN":"en-US";
+speechSynthesis.cancel();
+speechSynthesis.speak(speech);
+}
+</script>
+</body>
+</html>
