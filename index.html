@@ -6,304 +6,141 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Video Maker Pro</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#101326;color:white;font-family:Arial,sans-serif;padding:20px}
-.container{max-width:600px;margin:auto}
-h1{text-align:center;color:#8b9cff}
-.card{background:#1c2140;padding:18px;border-radius:15px;margin-top:18px}
-label{display:block;margin:14px 0 7px}
-textarea,select{width:100%;padding:13px;border-radius:9px;border:0;background:#303858;color:white;font-size:16px}
-textarea{height:110px}
-button{width:100%;padding:15px;margin-top:15px;border:0;border-radius:10px;background:#655cff;color:white;font-size:17px;font-weight:bold}
-.output{white-space:pre-wrap;line-height:1.6;background:#101326;padding:14px;border-radius:10px;margin-top:15px;min-height:60px}
-.small{text-align:center;color:#aaa;font-size:13px}
+body{font-family:Arial;background:#101827;color:white;margin:0;padding:20px}
+h1{text-align:center;color:#38bdf8}
+p{text-align:center;color:#cbd5e1}
+.card{background:#1e293b;padding:22px;margin:18px 0;border-radius:15px;text-align:center}
+button{background:#0284c7;color:white;border:0;padding:14px;border-radius:10px;font-size:17px;width:100%;margin-top:12px}
+textarea,input,select{width:100%;box-sizing:border-box;padding:12px;margin-top:12px;border-radius:8px;border:0;font-size:16px}
+.panel{display:none}
+.back{background:#475569}
 </style>
 </head>
 <body>
-<div class="container">
-<h1>🎬 AI VIDEO MAKER PRO</h1>
-<p class="small">Create amazing video scripts and AI prompts</p>
 
+<h1>AI Video Maker Pro</h1>
+<p>Create videos with AI tools</p>
+
+<div id="home">
 <div class="card">
-<label>Enter Your Video Topic</label>
-<textarea id="topic" placeholder="Example: What happens inside a black hole?"></textarea>
-
-<label>Video Language</label>
-<select id="lang">
-<option value="English">English</option>
-<option value="Hindi">Hindi</option>
-</select>
-
-<label>Video Format</label>
-<select id="format">
-<option value="9:16">YouTube Shorts (9:16)</option>
-<option value="16:9">YouTube Video (16:9)</option>
-</select>
-
-<label>Video Duration</label>
-<select id="duration">
-<option>30 Seconds</option>
-<option>60 Seconds</option>
-</select>
-
-<button onclick="generate()">Generate Video Prompt</button>
+<h2>🎬 Text to Video</h2>
+<p>Write a topic and create a video plan.</p>
+<button onclick="show('video')">Open Text to Video</button>
 </div>
 
 <div class="card">
-<h3>✨ Your Video Plan</h3>
-<div id="output" class="output">Your video plan will appear here...</div>
-<button onclick="copyText()">Copy Video Plan</button>
-<button onclick="makeVoice()">🔊 Listen to Voice</button>
+<h2>🎙️ Text to Speech</h2>
+<p>Convert your text into voice.</p>
+<button onclick="show('speech')">Open Text to Speech</button>
 </div>
 
-<p class="small">AI Video Maker Pro | Version 1.0</p>
+<div class="card">
+<h2>🖼️ Image to Video</h2>
+<p>Turn your photos into a video.</p>
+<button onclick="show('image')">Open Image to Video</button>
+</div>
+</div>
+
+<div id="video" class="panel card">
+<h2>Text to Video</h2>
+<textarea id="topic" placeholder="Write your video topic"></textarea>
+<select id="vlang"><option>English</option><option>Hindi</option></select>
+<button onclick="makePlan()">Generate Video Plan</button>
+<textarea id="plan" placeholder="Your video plan will appear here"></textarea>
+<button onclick="downloadPlan()">Download Plan</button>
+<button class="back" onclick="show('home')">Back Home</button>
+</div>
+
+<div id="speech" class="panel card">
+<h2>Text to Speech</h2>
+<textarea id="speechText" placeholder="Write text for voice"></textarea>
+<select id="slang"><option value="en-US">English</option><option value="hi-IN">Hindi</option></select>
+<button onclick="speak()">Play Voice</button>
+<button class="back" onclick="show('home')">Back Home</button>
+</div>
+
+<div id="image" class="panel card">
+<h2>Image to Video</h2>
+<input type="file" id="photos" accept="image/*" multiple>
+<input type="file" id="audio" accept="audio/*">
+<p>First upload photos, then optional voice/audio.</p>
+<button onclick="makeVideo()">Create Video</button>
+<video id="preview" controls style="width:100%;margin-top:15px"></video>
+<a id="download" style="color:#38bdf8;display:block;margin:15px"></a>
+<button class="back" onclick="show('home')">Back Home</button>
 </div>
 
 <script>
-function generate(){
-let topic=document.getElementById("topic").value.trim();
-let lang=document.getElementById("lang").value;
-let format=document.getElementById("format").value;
-let duration=document.getElementById("duration").value;
-if(!topic){alert("Please enter a video topic!");return;}
-let text=`AI VIDEO MAKER PRO
-
-TOPIC: ${topic}
-LANGUAGE: ${lang}
-FORMAT: ${format}
-DURATION: ${duration}
-
-SCENE 1 - HOOK
-Create a powerful opening scene about ${topic}. Use cinematic camera movement and realistic visuals.
-
-SCENE 2 - EXPLANATION
-Show detailed realistic visuals explaining ${topic}. Use dramatic lighting and smooth camera movement.
-
-SCENE 3 - AMAZING FACT
-Show an impressive visual fact about ${topic}. Use 4K documentary style.
-
-SCENE 4 - ENDING
-Create a memorable ending with cinematic visuals.
-
-VOICEOVER:
-Write an engaging ${lang} narration about ${topic}, suitable for a ${duration} video.
-
-EDITING:
-Use smooth transitions, background music, subtitles and sound effects.
-
-VIDEO QUALITY:
-Ultra realistic, cinematic, 4K.
-Aspect ratio: ${format}`;
-document.getElementById("output").innerText=text;
+function show(page){
+document.getElementById('home').style.display=page==='home'?'block':'none';
+['video','speech','image'].forEach(x=>{
+document.getElementById(x).style.display=page===x?'block':'none';
+});
 }
-function copyText(){
-let text=document.getElementById("output").innerText;
-if(!text || text.includes("will appear")){alert("Generate a video plan first");return;}
-navigator.clipboard.writeText(text).then(()=>alert("Copied successfully!")).catch(()=>alert("Please select and copy the text manually."));
+function makePlan(){
+let t=document.getElementById('topic').value;
+if(!t){alert('Please write a topic');return;}
+document.getElementById('plan').value=
+'Video Topic: '+t+
+'\nScene 1: Opening visual of '+t+
+'\nScene 2: Show important details about '+t+
+'\nScene 3: Show amazing facts about '+t+
+'\nScene 4: Strong ending and subscribe message.';
 }
-function makeVoice(){
-let text=document.getElementById("output").innerText;
-if(!text || text.includes("will appear")){alert("Generate a video plan first");return;}
-let speech=new SpeechSynthesisUtterance(text);
-speech.lang=document.getElementById("lang").value==="Hindi"?"hi-IN":"en-US";
-speechSynthesis.cancel();
-speechSynthesis.speak(speech);
-}
-function downloadVoice(){
-  const text = document.getElementById("output").innerText;
-  if(!text || text.includes("will appear")){
-    alert("Please generate a video plan first");
-    return;
-  }
-
-  const speech = new SpeechSynthesisUtterance(text);
-  speech.lang = document.getElementById("lang").value === "Hindi"
-    ? "hi-IN" : "en-US";
-
-  speech.onend = function(){
-    alert("Voice playback completed!");
-  };
-
-  speechSynthesis.speak(speech);
-}
-
 function downloadPlan(){
-  const text = document.getElementById("output").innerText;
-  if(!text || text.includes("will appear")){
-    alert("Generate a video plan first");
-    return;
-  }
-
-  const blob = new Blob([text], {type:"text/plain"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "AI-Video-Plan.txt";
-  a.click();
-  URL.revokeObjectURL(url);
+let b=new Blob([document.getElementById('plan').value],{type:'text/plain'});
+let a=document.createElement('a');a.href=URL.createObjectURL(b);
+a.download='video-plan.txt';a.click();
 }
-
-</script>
-</
-<div class="card">
-<h3>🎬 Create Your Video</h3>
-<label>Video Title</label>
-<input id="videoTitle" placeholder="Enter video title" style="width:100%;padding:12px;border-radius:8px">
-
-<label>Upload Scene Images</label>
-<input id="sceneImages" type="file" accept="image/*" multiple style="margin-top:12px">
-
-<label>Background Music</label>
-<input id="musicFile" type="file" accept="audio/*">
-
-<button onclick="createVideo()">Create MP4 Video</button>
-<video id="preview" controls style="width:100%;margin-top:15px"></video>
-<button onclick="downloadVideo()">Download Video</button>
-<p id="videoStatus">Ready to create your video.</p>
-</div>
-
-<script>
-let finalVideoURL = null;
-
-async function createVideo(){
- const files = [...document.getElementById("sceneImages").files];
- const status = document.getElementById("videoStatus");
- if(files.length === 0){
-  alert("Please upload scene images first");
-  return;
- }
-
- const video = document.createElement("video");
- const canvas = document.createElement("canvas");
- canvas.width = 720;
- canvas.height = 1280;
- const ctx = canvas.getContext("2d");
- const stream = canvas.captureStream(25);
- const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
-  ? "video/webm;codecs=vp9" : "video/webm";
-
- const recorder = new MediaRecorder(stream,{mimeType:mime});
- const chunks = [];
- recorder.ondataavailable = e => {if(e.data.size) chunks.push(e.data);};
- const finished = new Promise(resolve => recorder.onstop = resolve);
- recorder.start();
-
- for(const file of files){
-  const img = new Image();
-  const url = URL.createObjectURL(file);
-  await new Promise((resolve,reject)=>{
-   img.onload=resolve;
-   img.onerror=reject;
-   img.src=url;
-  });
-  ctx.fillStyle="#000";
-  ctx.fillRect(0,0,720,1280);
-  const scale=Math.max(720/img.width,1280/img.height);
-  const w=img.width*scale, h=img.height*scale;
-  ctx.drawImage(img,(720-w)/2,(1280-h)/2,w,h);
-  URL.revokeObjectURL(url);
-  await new Promise(r=>setTimeout(r,3000));
- }
- recorder.stop();
- await finished;
- finalVideoURL=URL.createObjectURL(new Blob(chunks,{type:mime}));
- document.getElementById("preview").src=finalVideoURL;
- status.textContent="Video created! Download it below.";
+function speak(){
+let t=document.getElementById('speechText').value;
+if(!t){alert('Please write text');return;}
+let u=new SpeechSynthesisUtterance(t);
+u.lang=document.getElementById('slang').value;
+speechSynthesis.cancel();speechSynthesis.speak(u);
 }
-
-function downloadVideo(){
- if(!finalVideoURL){
-  alert("Create a video first");
-  return;
- }
- const a=document.createElement("a");
- a.href=finalVideoURL;
- a.download="My-AI-Video.webm";
- a.click();
+async function makeVideo(){
+let files=document.getElementById('photos').files;
+if(!files.length){alert('Please upload photos');return;}
+if(!window.MediaRecorder){alert('Video recording is not supported in this browser');return;}
+let canvas=document.createElement('canvas');
+canvas.width=720;canvas.height=1280;
+let ctx=canvas.getContext('2d');
+let stream=canvas.captureStream(25);
+let recorder;
+try{
+recorder=new MediaRecorder(stream,{mimeType:'video/webm'});
+}catch(e){
+try{recorder=new MediaRecorder(stream);}
+catch(err){alert('Video recording not supported');return;}
 }
-</script>
-  
-<div class="card">
-<h3>🎬 Create Your Video</h3>
-<label>Video Title</label>
-<input id="videoTitle" placeholder="Enter video title" style="width:100%;padding:12px;border-radius:8px">
-
-<label>Upload Scene Images</label>
-<input id="sceneImages" type="file" accept="image/*" multiple style="margin-top:12px">
-
-<label>Background Music</label>
-<input id="musicFile" type="file" accept="audio/*">
-
-<button onclick="createVideo()">Create MP4 Video</button>
-<video id="preview" controls style="width:100%;margin-top:15px"></video>
-<button onclick="downloadVideo()">Download Video</button>
-<p id="videoStatus">Ready to create your video.</p>
-</div>
-
-<script>
-let finalVideoURL = null;
-
-async function createVideo(){
- const files = [...document.getElementById("sceneImages").files];
- const status = document.getElementById("videoStatus");
- if(files.length === 0){
-  alert("Please upload scene images first");
-  return;
- }
-
- const video = document.createElement("video");
- const canvas = document.createElement("canvas");
- canvas.width = 720;
- canvas.height = 1280;
- const ctx = canvas.getContext("2d");
- const stream = canvas.captureStream(25);
- const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
-  ? "video/webm;codecs=vp9" : "video/webm";
-
- const recorder = new MediaRecorder(stream,{mimeType:mime});
- const chunks = [];
- recorder.ondataavailable = e => {if(e.data.size) chunks.push(e.data);};
- const finished = new Promise(resolve => recorder.onstop = resolve);
- recorder.start();
-
- for(const file of files){
-  const img = new Image();
-  const url = URL.createObjectURL(file);
-  await new Promise((resolve,reject)=>{
-   img.onload=resolve;
-   img.onerror=reject;
-   img.src=url;
-  });
-  ctx.fillStyle="#000";
-  ctx.fillRect(0,0,720,1280);
-  const scale=Math.max(720/img.width,1280/img.height);
-  const w=img.width*scale, h=img.height*scale;
-  ctx.drawImage(img,(720-w)/2,(1280-h)/2,w,h);
-  URL.revokeObjectURL(url);
-  await new Promise(r=>setTimeout(r,3000));
- }
- recorder.stop();
- await finished;
- finalVideoURL=URL.createObjectURL(new Blob(chunks,{type:mime}));
- document.getElementById("preview").src=finalVideoURL;
- status.textContent="Video created! Download it below.";
+let chunks=[];
+recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
+recorder.onstop=()=>{
+let blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});
+let url=URL.createObjectURL(blob);
+document.getElementById('preview').src=url;
+let a=document.getElementById('download');
+a.href=url;a.download='My-Video.webm';a.textContent='Download Video';
+};
+recorder.start();
+for(let f of files){
+let img=new Image();
+let url=URL.createObjectURL(f);
+await new Promise(resolve=>{
+img.onload=resolve;img.onerror=resolve;img.src=url;
+});
+ctx.fillStyle='black';ctx.fillRect(0,0,720,1280);
+if(img.width&&img.height){
+let scale=Math.max(720/img.width,1280/img.height);
+let w=img.width*scale,h=img.height*scale;
+ctx.drawImage(img,(720-w)/2,(1280-h)/2,w,h);
 }
-
-function downloadVideo(){
- if(!finalVideoURL){
-  alert("Create a video first");
-  return;
- }
- const a=document.createElement("a");
- a.href=finalVideoURL;
- a.download="My-AI-Video.webm";
- a.click();
+await new Promise(r=>setTimeout(r,3000));
+URL.revokeObjectURL(url);
+}
+recorder.stop();
 }
 </script>
 </body>
-</html>
-
-</body>
-</html>
-body>
 </html>
