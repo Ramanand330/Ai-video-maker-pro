@@ -76,8 +76,36 @@ document.getElementById('home').style.display=page==='home'?'block':'none';
 ['video','speech','image'].forEach(x=>{
 document.getElementById(x).style.display=page===x?'block':'none';
 });
-}
+
+
 function makePlan(){
+let t=document.getElementById('topic').value.trim();
+if(!t){alert('Please write a topic');return;}
+
+let lang=document.getElementById('vlang').value;
+let plan='';
+
+if(lang==='English'){
+plan='30 SECOND VIDEO SCRIPT\n\n';
+plan+='Scene 1 (0-6 sec): Powerful opening hook about '+t+'.\n';
+plan+='Scene 2 (6-12 sec): Show the first amazing visual and explain the topic.\n';
+plan+='Scene 3 (12-18 sec): Reveal an interesting fact about '+t+'.\n';
+plan+='Scene 4 (18-24 sec): Show a surprising detail with cinematic visuals.\n';
+plan+='Scene 5 (24-30 sec): Finish with a strong ending and subscribe message.\n\n';
+plan+='VOICEOVER:\nDiscover the amazing world of '+t+'. Get ready to explore something incredible. Follow us for more amazing facts!';
+}else{
+plan='30 सेकंड की वीडियो स्क्रिप्ट\n\n';
+plan+='सीन 1 (0-6 सेकंड): '+t+' पर शानदार शुरुआत।\n';
+plan+='सीन 2 (6-12 सेकंड): विषय का पहला रोचक दृश्य दिखाएँ।\n';
+plan+='सीन 3 (12-18 सेकंड): '+t+' से जुड़ा एक रोचक तथ्य बताएँ।\n';
+plan+='सीन 4 (18-24 सेकंड): एक चौंकाने वाली जानकारी दिखाएँ।\n';
+plan+='सीन 5 (24-30 सेकंड): शानदार अंत और सब्सक्राइब करने की अपील।\n\n';
+plan+='वॉइसओवर:\nआइए जानते हैं '+t+' के बारे में कुछ बेहद रोचक बातें। ऐसी ही जानकारी के लिए हमारे चैनल को सब्सक्राइब करें।';
+}
+
+document.getElementById('plan').value=plan;
+}
+
 let t=document.getElementById('topic').value;
 if(!t){alert('Please write a topic');return;}
 document.getElementById('plan').value=
