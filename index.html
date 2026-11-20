@@ -1,173 +1,96 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AI Video Maker Pro</title>
 <style>
-body{font-family:Arial;background:#101827;color:white;margin:0;padding:20px}
-h1{text-align:center;color:#38bdf8}
-p{text-align:center;color:#cbd5e1}
-.card{background:#1e293b;padding:22px;margin:18px 0;border-radius:15px;text-align:center}
-button{background:#0284c7;color:white;border:0;padding:14px;border-radius:10px;font-size:17px;width:100%;margin-top:12px}
-textarea,input,select{width:100%;box-sizing:border-box;padding:12px;margin-top:12px;border-radius:8px;border:0;font-size:16px}
-.panel{display:none}
-.back{background:#475569}
+:root{--bg:#0b1220;--panel:#121d31;--text:#eef4ff;--muted:#a6b4cc;--accent:#6ee7b7;--line:#26344d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px system-ui,Arial,sans-serif}
+header{padding:20px 16px;background:linear-gradient(120deg,#142544,#0b1220);border-bottom:1px solid var(--line)}
+h1{margin:0 0 5px;font-size:25px}header p{margin:0;color:var(--muted)}
+main{max-width:900px;margin:auto;padding:14px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px;margin:12px 0}
+label{display:block;margin:12px 0 6px;font-weight:650}input,textarea,select,button{font:inherit}
+input,textarea,select{width:100%;padding:11px;border-radius:9px;border:1px solid var(--line);background:#091326;color:var(--text)}
+textarea{min-height:90px;resize:vertical}button{border:0;border-radius:10px;padding:11px 14px;background:var(--accent);color:#05251a;font-weight:750;cursor:pointer;margin:6px 4px 6px 0}button.secondary{background:#263a59;color:white}button:disabled{opacity:.5}
+.small{color:var(--muted);font-size:13px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.scene{border:1px solid var(--line);border-radius:12px;padding:12px;margin:12px 0}.scene img{width:100%;max-height:220px;object-fit:contain;background:#070c15;border-radius:8px}.scene textarea{min-height:70px}.preview{width:100%;max-width:380px;margin:auto;aspect-ratio:9/16;background:#111;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;border-radius:14px}.preview canvas{width:100%;height:100%}.status{padding:10px;background:#091326;border-radius:8px;margin-top:10px;white-space:pre-wrap}.hide{display:none}
+@media(max-width:600px){.grid{grid-template-columns:1fr}main{padding:9px}.panel{padding:12px}}
 </style>
 </head>
 <body>
-
-<h1>AI Video Maker Pro</h1>
-<p>Create videos with AI tools</p>
-
-<div id="home">
-<div class="card">
-<h2>🎬 Text to Video</h2>
-<p>Write a topic and create a video plan.</p>
-<button onclick="show('video')">Open Text to Video</button>
+<header><h1>🎬 AI Video Maker Pro</h1><p>Hindi / English • Shorts 9:16 • YouTube 16:9 • Free browser tools</p></header>
+<main>
+<div class="panel">
+<label>Video topic / विषय</label><input id="topic" placeholder="What if Earth stopped spinning?">
+<label>Video format</label><select id="ratio"><option value="9:16">Shorts / Reels (9:16)</option><option value="16:9">YouTube (16:9)</option></select>
+<label>Video language</label><select id="lang"><option>Hindi</option><option>English</option></select>
+<label>Voice script</label><textarea id="script" placeholder="यहाँ अपनी narration लिखें..."></textarea>
+<button onclick="buildScenes()">Build Scenes / Scene बनाएं</button>
+<button class="secondary" onclick="speakScript()">Listen / सुनें</button>
+<button class="secondary" onclick="stopSpeech()">Stop Voice</button>
+<p class="small">Voice uses your browser's speech service. Voice availability depends on your device/browser.</p>
 </div>
-
-<div class="card">
-<h2>🎙️ Text to Speech</h2>
-<p>Convert your text into voice.</p>
-<button onclick="show('speech')">Open Text to Speech</button>
+<div class="panel">
+<h2>Scene Images</h2><p class="small">हर Scene में फोटो अपलोड करें। यह app तस्वीरों को motion देकर वीडियो रिकॉर्ड करेगा। वास्तविक AI footage बनाने के लिए बाहरी AI model/API जरूरी है।</p>
+<div id="scenes"></div>
 </div>
-
-<div class="card">
-<h2>🖼️ Image to Video</h2>
-<p>Turn your photos into a video.</p>
-<button onclick="show('image')">Open Image to Video</button>
+<div class="panel">
+<h2>Video Preview</h2>
+<div class="preview"><canvas id="canvas" width="720" height="1280"></canvas></div>
+<label>Duration per scene (seconds)</label><input id="duration" type="number" value="5" min="2" max="30">
+<label>Voice audio file (optional)</label><input id="audioFile" type="file" accept="audio/*">
+<button onclick="previewScenes()">Preview Scenes</button>
+<button onclick="renderVideo()">Record Video / वीडियो बनाएं</button>
+<p class="small">रिकॉर्डिंग canvas से WebM वीडियो बनाती है (MP4 नहीं)। Browser की compatibility के अनुसार download होगा। लंबे वीडियो पर मोबाइल गर्म/धीमा हो सकता है।</p>
+<div id="status" class="status">Ready. पहले topic और scenes तैयार करें।</div>
+<a id="download" class="hide" download="ai-video-maker.webm">Download video</a>
 </div>
-</div>
-
-<div id="video" class="panel card">
-<h2>Text to Video</h2>
-<textarea id="topic" placeholder="Write your video topic"></textarea>
-<select id="vlang"><option>English</option><option>Hindi</option></select>
-<button onclick="makePlan()">Generate Video Plan</button>
-<textarea id="plan" placeholder="Your video plan will appear here"></textarea>
-<button onclick="downloadPlan()">Download Plan</button>
-<button class="back" onclick="show('home')">Back Home</button>
-</div>
-
-<div id="speech" class="panel card">
-<h2>Text to Speech</h2>
-<textarea id="speechText" placeholder="Write text for voice"></textarea>
-<select id="slang"><option value="en-US">English</option><option value="hi-IN">Hindi</option></select>
-<button onclick="speak()">Play Voice</button>
-<button class="back" onclick="show('home')">Back Home</button>
-</div>
-
-<div id="image" class="panel card">
-<h2>Image to Video</h2>
-<input type="file" id="photos" accept="image/*" multiple>
-<input type="file" id="audio" accept="audio/*">
-<p>First upload photos, then optional voice/audio.</p>
-<button onclick="makeVideo()">Create Video</button>
-<video id="preview" controls style="width:100%;margin-top:15px"></video>
-<a id="download" style="color:#38bdf8;display:block;margin:15px"></a>
-<button class="back" onclick="show('home')">Back Home</button>
-</div>
-
+</main>
 <script>
-function show(page){
-document.getElementById('home').style.display=page==='home'?'block':'none';
-['video','speech','image'].forEach(x=>{
-document.getElementById(x).style.display=page===x?'block':'none';
-});
-
-
-function makePlan(){
-let t=document.getElementById('topic').value.trim();
-if(!t){alert('Please write a topic');return;}
-
-let lang=document.getElementById('vlang').value;
-let plan='';
-
-if(lang==='English'){
-plan='30 SECOND VIDEO SCRIPT\n\n';
-plan+='Scene 1 (0-6 sec): Powerful opening hook about '+t+'.\n';
-plan+='Scene 2 (6-12 sec): Show the first amazing visual and explain the topic.\n';
-plan+='Scene 3 (12-18 sec): Reveal an interesting fact about '+t+'.\n';
-plan+='Scene 4 (18-24 sec): Show a surprising detail with cinematic visuals.\n';
-plan+='Scene 5 (24-30 sec): Finish with a strong ending and subscribe message.\n\n';
-plan+='VOICEOVER:\nDiscover the amazing world of '+t+'. Get ready to explore something incredible. Follow us for more amazing facts!';
-}else{
-plan='30 सेकंड की वीडियो स्क्रिप्ट\n\n';
-plan+='सीन 1 (0-6 सेकंड): '+t+' पर शानदार शुरुआत।\n';
-plan+='सीन 2 (6-12 सेकंड): विषय का पहला रोचक दृश्य दिखाएँ।\n';
-plan+='सीन 3 (12-18 सेकंड): '+t+' से जुड़ा एक रोचक तथ्य बताएँ।\n';
-plan+='सीन 4 (18-24 सेकंड): एक चौंकाने वाली जानकारी दिखाएँ।\n';
-plan+='सीन 5 (24-30 सेकंड): शानदार अंत और सब्सक्राइब करने की अपील।\n\n';
-plan+='वॉइसओवर:\nआइए जानते हैं '+t+' के बारे में कुछ बेहद रोचक बातें। ऐसी ही जानकारी के लिए हमारे चैनल को सब्सक्राइब करें।';
+let sceneData=[],current=0,images=[],recording=false;
+const canvas=document.getElementById('canvas'),ctx=canvas.getContext('2d');
+function setStatus(s){document.getElementById('status').textContent=s}
+function buildScenes(){
+ const topic=document.getElementById('topic').value.trim()||'Your video topic';
+ let script=document.getElementById('script').value.trim();
+ if(!script){script=`क्या आपने कभी सोचा है ${topic}?\nयह एक रोचक घटना हो सकती है!\nऐसा होने पर दुनिया में बड़े बदलाव होंगे!\nआप क्या सोचते हैं?`;document.getElementById('script').value=script}
+ const parts=script.split(/[.!?।\n]+/).map(x=>x.trim()).filter(Boolean);
+ sceneData=Array.from({length:5},(_,i)=>({text:parts[i]||parts[parts.length-1]||topic,prompt:`Cinematic realistic video scene illustrating: ${topic}. Scene ${i+1}, documentary visuals, dramatic lighting, vertical composition.`}));
+ images=Array(5).fill(null);renderSceneInputs();setStatus('5 scene prompts तैयार हैं। प्रत्येक scene के लिए image upload करें।')
 }
-
-document.getElementById('plan').value=plan;
+function renderSceneInputs(){
+ const box=document.getElementById('scenes');box.innerHTML='';
+ sceneData.forEach((s,i)=>{
+ let div=document.createElement('div');div.className='scene';
+ div.innerHTML=`<h3>Scene ${i+1}</h3><label>Scene narration</label><textarea id="st${i}"></textarea><label>AI image prompt (copy करें और image generator में इस्तेमाल करें)</label><textarea id="sp${i}"></textarea><label>Image upload</label><input id="si${i}" type="file" accept="image/*"><div id="im${i}"></div>`;
+ box.appendChild(div);div.querySelector(`#st${i}`).value=s.text;div.querySelector(`#sp${i}`).value=s.prompt;
+ div.querySelector(`#si${i}`).addEventListener('change',e=>{if(e.target.files[0]){let url=URL.createObjectURL(e.target.files[0]);images[i]=new Image();images[i].onload=()=>{document.getElementById(`im${i}`).innerHTML='';document.getElementById(`im${i}`).appendChild(images[i]);};images[i].src=url;}});
+ });
 }
-
-let t=document.getElementById('topic').value;
-if(!t){alert('Please write a topic');return;}
-document.getElementById('plan').value=
-'Video Topic: '+t+
-'\nScene 1: Opening visual of '+t+
-'\nScene 2: Show important details about '+t+
-'\nScene 3: Show amazing facts about '+t+
-'\nScene 4: Strong ending and subscribe message.';
+function speakScript(){let t=document.getElementById('script').value;if(!t)return setStatus('पहले voice script लिखें।');if(!('speechSynthesis'in window))return setStatus('इस browser में speech सुविधा उपलब्ध नहीं है।');speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang=document.getElementById('lang').value==='Hindi'?'hi-IN':'en-US';speechSynthesis.speak(u)}
+function stopSpeech(){if('speechSynthesis'in window)speechSynthesis.cancel()}
+function setupSize(){if(document.getElementById('ratio').value==='9:16'){canvas.width=720;canvas.height=1280}else{canvas.width=1280;canvas.height=720}}
+function drawScene(i,progress=0){
+ setupSize();ctx.fillStyle='#101827';ctx.fillRect(0,0,canvas.width,canvas.height);
+ let im=images[i];if(im&&im.complete&&im.naturalWidth){let scale=Math.max(canvas.width/im.width,canvas.height/im.height)*(1+progress*.08),w=im.width*scale,h=im.height*scale;ctx.save();ctx.translate(canvas.width/2,canvas.height/2);ctx.translate(-w/2,-h/2);ctx.drawImage(im,0,0,w,h);ctx.restore()}
+ else {let grd=ctx.createLinearGradient(0,0,canvas.width,canvas.height);grd.addColorStop(0,'#12305b');grd.addColorStop(1,'#090e1a');ctx.fillStyle=grd;ctx.fillRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font=`bold ${Math.max(28,canvas.width/24)}px Arial`;wrapText(ctx,sceneData[i]?.prompt||'Upload an image',canvas.width*.12,canvas.height*.38,canvas.width*.76,canvas.width/18)}
+ ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(0,canvas.height*.72,canvas.width,canvas.height*.28);
+ ctx.fillStyle='#fff';ctx.textAlign='center';ctx.font=`bold ${Math.max(26,canvas.width/25)}px Arial`;wrapText(ctx,document.getElementById(`st${i}`)?.value||'',canvas.width*.08,canvas.height*.78,canvas.width*.84,canvas.width/18);
+ ctx.fillStyle='#6ee7b7';ctx.font=`bold ${Math.max(18,canvas.width/36)}px Arial`;ctx.fillText('AI VIDEO MAKER PRO',canvas.width/2,canvas.height*.95);
 }
-function downloadPlan(){
-let b=new Blob([document.getElementById('plan').value],{type:'text/plain'});
-let a=document.createElement('a');a.href=URL.createObjectURL(b);
-a.download='video-plan.txt';a.click();
-}
-function speak(){
-let t=document.getElementById('speechText').value;
-if(!t){alert('Please write text');return;}
-let u=new SpeechSynthesisUtterance(t);
-u.lang=document.getElementById('slang').value;
-speechSynthesis.cancel();speechSynthesis.speak(u);
-}
-async function makeVideo(){
-let files=document.getElementById('photos').files;
-if(!files.length){alert('Please upload photos');return;}
-if(!window.MediaRecorder){alert('Video recording is not supported in this browser');return;}
-let canvas=document.createElement('canvas');
-canvas.width=720;canvas.height=1280;
-let ctx=canvas.getContext('2d');
-let stream=canvas.captureStream(25);
-let recorder;
-try{
-recorder=new MediaRecorder(stream,{mimeType:'video/webm'});
-}catch(e){
-try{recorder=new MediaRecorder(stream);}
-catch(err){alert('Video recording not supported');return;}
-}
-let chunks=[];
-recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data);};
-recorder.onstop=()=>{
-let blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});
-let url=URL.createObjectURL(blob);
-document.getElementById('preview').src=url;
-let a=document.getElementById('download');
-a.href=url;a.download='My-Video.webm';a.textContent='Download Video';
-};
-recorder.start();
-for(let f of files){
-let img=new Image();
-let url=URL.createObjectURL(f);
-await new Promise(resolve=>{
-img.onload=resolve;img.onerror=resolve;img.src=url;
-});
-ctx.fillStyle='black';ctx.fillRect(0,0,720,1280);
-if(img.width&&img.height){
-let scale=Math.max(720/img.width,1280/img.height);
-let w=img.width*scale,h=img.height*scale;
-ctx.drawImage(img,(720-w)/2,(1280-h)/2,w,h);
-}
-await new Promise(r=>setTimeout(r,3000));
-URL.revokeObjectURL(url);
-}
-recorder.stop();
+function wrapText(c,t,x,y,maxWidth,lineHeight){let words=t.split(/\s+/),line='';for(let n=0;n<words.length;n++){let test=line+words[n]+' ',w=c.measureText(test).width;if(w>maxWidth&&n>0){c.fillText(line,x,y);line=words[n]+' ';y+=lineHeight}else line=test}if(line)c.fillText(line,x,y)}
+async function previewScenes(){if(!sceneData.length)buildScenes();let i=0;setStatus('Preview चल रहा है…');let dur=Number(document.getElementById('duration').value)||5;for(i=0;i<sceneData.length;i++){current=i;let start=performance.now();while(performance.now()-start<dur*1000){drawScene(i,(performance.now()-start)/(dur*1000));await new Promise(r=>setTimeout(r,50))}}drawScene(sceneData.length-1);setStatus('Preview complete.')}
+async function renderVideo(){
+ if(!sceneData.length)buildScenes();
+ if(!canvas.captureStream||!window.MediaRecorder)return setStatus('इस browser में video recording supported नहीं है। Chrome में खोलें।');
+ if(!images.some(x=>x&&x.complete))setStatus('आपने कोई scene image upload नहीं किया है। Text-based scenes भी record होंगे।');
+ let stream=canvas.captureStream(30),audioEl=document.getElementById('audioFile'),audioStream=null;
+ if(audioEl.files[0]){let audio=new Audio(URL.createObjectURL(audioEl.files[0]));audioStream=audio;try{let astream=audio.captureStream();astream.getAudioTracks().forEach(t=>stream.addTrack(t));audio.play()}catch(e){}}
+ let mime=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(x=>MediaRecorder.isTypeSupported(x))||'';
+ let rec=new MediaRecorder(stream,mime?{mimeType:mime}:{}),chunks=[];rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};rec.onstop=()=>{let blob=new Blob(chunks,{type:rec.mimeType||'video/webm'}),url=URL.createObjectURL(blob),a=document.getElementById('download');a.href=url;a.classList.remove('hide');a.textContent='Download video';a.click();setStatus('Video रिकॉर्ड हो गया। Download शुरू हुआ/लिंक तैयार है।');stream.getTracks().forEach(t=>t.stop())};
+ rec.start();let dur=Number(document.getElementById('duration').value)||5;
+ for(let i=0;i<sceneData.length;i++){setStatus(`Recording scene ${i+1}/${sceneData.length}...`);let start=performance.now();while(performance.now()-start<dur*1000){drawScene(i,(performance.now()-start)/(dur*1000));await new Promise(r=>setTimeout(r,33))}}
+ rec.stop();
 }
 </script>
 </body>
